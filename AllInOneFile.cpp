@@ -6,7 +6,7 @@
 /*   By: ivotints <ivotints@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 19:31:51 by ivotints          #+#    #+#             */
-/*   Updated: 2024/10/01 15:53:11 by ivotints         ###   ########.fr       */
+/*   Updated: 2024/10/01 18:12:33 by ivotints         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ class PmergeMe
 		PmergeMe operator=(const PmergeMe &) { return *this;}
 		~PmergeMe() {}
 		static double	log2(double x);
-		static t_index	ford_johnson_algorithm(const std::vector<int>& to_sort);
+		static t_index	ford_johnson_algorithm(std::vector<int>& to_sort, int &compar_num);
+		typedef std::vector<int>::iterator iterator;
 
 	public:
 		static int	merge_insertion_sort(std::vector<int>::iterator begin, std::vector<int>::iterator end);
@@ -46,31 +47,149 @@ class PmergeMe
 
 };
 
-
-
-
-
-
-
-
-
-
-int	PmergeMe::merge_insertion_sort(std::vector<int>::iterator begin, std::vector<int>::iterator end)
+int	PmergeMe::merge_insertion_sort(iterator begin, iterator end)
 {
 	std::vector<int> to_sort(begin, end);
 	int number_of_comparisons_made = 0;
-	t_index result = ford_johnson_algorithm(to_sort);
+	t_index result = ford_johnson_algorithm(to_sort, number_of_comparisons_made);
 	std::copy(result.vector.begin(), result.vector.end(), begin);
 	return (number_of_comparisons_made);
 }
 
-t_index PmergeMe::ford_johnson_algorithm(const std::vector<int>& to_sort)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+t_index PmergeMe::ford_johnson_algorithm(std::vector<int>& to_sort, int &compar_num)
 {
 	t_index result;
 	result.vector = to_sort;
-	std::sort(result.vector.begin(), result.vector.end()); // Simple sorting for now
-	return result;
+	int size = to_sort.size();
+	for (int i = 0; i < size; ++i)
+		result.index.push_back(i);
+	if (size == 1)
+		return (result);
+	std::vector<int> main_sequence;
+	std::vector<int> sub_sequence;
+	for (iterator it = to_sort.begin(); it != to_sort.end(); it += 2)
+	{
+		if (it + 1 != to_sort.end())
+		{
+			++compar_num;
+			if (*it < *(it + 1))
+			{
+				main_sequence.push_back(*(it + 1));
+				sub_sequence.push_back(*it);;
+			}
+			else
+			{
+				main_sequence.push_back(*it);
+				sub_sequence.push_back(*(it + 1));
+			}
+		}
+		else
+		{
+			sub_sequence.push_back(*it);;
+		}
+	}
+	t_index sorted = ford_johnson_algorithm(main_sequence, compar_num); // vector:     index:
+	for (int i = 0; i < size / 2; ++i)
+	{
+		std::swap(sub_sequence[i], sub_sequence[sorted.index[i]]);
+	}
+	for (int i = 0; i < size; ++i)
+	{
+		if (i == 0)
+		{
+			sorted.vector.insert(sorted.vector.begin(), sub_sequence.front());
+		}
+	}
+	return (sorted);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Function to calculate log base 2 of a number
 double PmergeMe::log2(double x)
