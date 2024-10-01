@@ -6,7 +6,7 @@
 /*   By: ivotints <ivotints@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 19:31:51 by ivotints          #+#    #+#             */
-/*   Updated: 2024/10/01 18:12:33 by ivotints         ###   ########.fr       */
+/*   Updated: 2024/10/01 19:11:39 by ivotints         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class PmergeMe
 		static double	log2(double x);
 		static t_index	ford_johnson_algorithm(std::vector<int>& to_sort, int &compar_num);
 		typedef std::vector<int>::iterator iterator;
+		static iterator binary_search(iterator begin, iterator end, int &num);
 
 	public:
 		static int	merge_insertion_sort(std::vector<int>::iterator begin, std::vector<int>::iterator end);
@@ -56,7 +57,19 @@ int	PmergeMe::merge_insertion_sort(iterator begin, iterator end)
 	return (number_of_comparisons_made);
 }
 
+//0 1 1 3 5 11 21 43 85 171 341 683 1365 2731 5461 10923 21845 43691
+int jacobsthal(int n)
+{
+	int dp[n + 1];
 
+	dp[0] = 0;
+	dp[1] = 1;
+
+	for (int i = 2; i <= n; i++)
+		dp[i] = dp[i - 1] + 2 * dp[i - 2];
+
+	return dp[n];
+}
 
 
 
@@ -100,49 +113,62 @@ t_index PmergeMe::ford_johnson_algorithm(std::vector<int>& to_sort, int &compar_
 {
 	t_index result;
 	result.vector = to_sort;
-	int size = to_sort.size();
+	int size = result.vector.size();
 	for (int i = 0; i < size; ++i)
 		result.index.push_back(i);
 	if (size == 1)
 		return (result);
 	std::vector<int> main_sequence;
 	std::vector<int> sub_sequence;
-	for (iterator it = to_sort.begin(); it != to_sort.end(); it += 2)
+	iterator it_vect = result.vector.begin();
+	iterator it_indx = result.index.begin();
+	while (it_vect != result.vector.end())
 	{
-		if (it + 1 != to_sort.end())
+		if (it_vect + 1 != result.vector.end())
 		{
 			++compar_num;
-			if (*it < *(it + 1))
+			if (*(it_vect + 1) < *it_vect)
 			{
-				main_sequence.push_back(*(it + 1));
-				sub_sequence.push_back(*it);;
+				std::swap(*it_vect, *(it_vect + 1));
+				std::swap(*it_indx, *(it_indx + 1));
 			}
-			else
-			{
-				main_sequence.push_back(*it);
-				sub_sequence.push_back(*(it + 1));
-			}
+			main_sequence.push_back(*(it_vect + 1));
+			sub_sequence.push_back(*it_vect);;
 		}
 		else
 		{
-			sub_sequence.push_back(*it);;
+			sub_sequence.push_back(*it_vect);;
 		}
+		it_vect += 2;
+		it_indx += 2;
 	}
 	t_index sorted = ford_johnson_algorithm(main_sequence, compar_num); // vector:     index:
 	for (int i = 0; i < size / 2; ++i)
 	{
 		std::swap(sub_sequence[i], sub_sequence[sorted.index[i]]);
 	}
-	for (int i = 0; i < size; ++i)
+	int k;
+	for (int i = 0; i < sub_sequence.size(); ++i)
 	{
 		if (i == 0)
 		{
 			sorted.vector.insert(sorted.vector.begin(), sub_sequence.front());
+			continue;
 		}
+		k = jacobsthal(i); // 2
+		sorted.vector.insert(binary_search(sorted.vector.begin(), sorted.vector.begin() + k, *(sub_sequence.begin() + k)), *(sub_sequence.begin() + k));
+
 	}
 	return (sorted);
 }
+//2
+//0 1 1 3 5 11 21 43 85 171 341 683 1365 2731 5461 10923 21845 43691
 
+PmergeMe::iterator PmergeMe::binary_search(iterator begin, iterator end, int &num)
+{
+
+
+}
 
 
 
