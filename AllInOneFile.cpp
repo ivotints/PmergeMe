@@ -6,7 +6,7 @@
 /*   By: ivotints <ivotints@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 19:31:51 by ivotints          #+#    #+#             */
-/*   Updated: 2024/10/02 19:58:48 by ivotints         ###   ########.fr       */
+/*   Updated: 2024/10/03 12:47:56 by ivotints         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ class PmergeMe
 		static t_index	ford_johnson_algorithm(t_index to_sort, int &compar_num);
 		typedef std::vector<int>::iterator iterator;
 		static iterator binary_search(iterator begin, iterator end, int &val, int &compar_num);
+		static int add_end_of_search(int i, int size);
+
 
 	public:
 		static int	merge_insertion_sort(std::vector<int>::iterator begin, std::vector<int>::iterator end);
@@ -64,7 +66,7 @@ int	PmergeMe::merge_insertion_sort(iterator begin, iterator end)
 }
 
 //0 1 1 3 5 11 21 43 85 171 341 683 1365 2731 5461 10923 21845 43691
-int jacobsthal(int n) // 1
+int jacobsthal(int n)
 {
 	if (n == 0)
 		return (0);
@@ -112,7 +114,15 @@ int jacobsthal_modified(int n)
 
 
 
+t_index cheat_algorithm(t_index main, int &compar_num)
+{
+	t_index result(main);
 
+	std::sort(result.index.begin(), result.index.end());
+	std::sort(result.vector.begin(), result.vector.end());
+
+	return (result);
+}
 
 
 
@@ -127,6 +137,10 @@ t_index PmergeMe::ford_johnson_algorithm(t_index to_sort, int &compar_num)
 		return (to_sort);
 	t_index main_sequence;
 	t_index sub_sequence;
+	main_sequence.vector.reserve((size) / 2);
+	main_sequence.index.reserve((size) / 2);
+	sub_sequence.vector.reserve((size + 1) / 2);
+	sub_sequence.index.reserve((size + 1) / 2);
 	iterator it_vect = to_sort.vector.begin();
 	iterator it_indx = to_sort.index.begin();
 	while (it_vect != to_sort.vector.end())
@@ -156,6 +170,7 @@ t_index PmergeMe::ford_johnson_algorithm(t_index to_sort, int &compar_num)
 	t_index sorted;
 	sorted.vector.reserve(size);
 	sorted.index.reserve(size);
+	//sorted = cheat_algorithm(main_sequence, compar_num);
 	sorted = ford_johnson_algorithm(main_sequence, compar_num);
 	t_index sorted_sub;
 	sorted_sub.vector.reserve((size + 1) / 2);
@@ -176,21 +191,18 @@ t_index PmergeMe::ford_johnson_algorithm(t_index to_sort, int &compar_num)
 	}
 	int k = 0;
 	int last_k;
-	for (int i = 0; i < sorted_sub.vector.size(); ++i)
+	// insert from sub_sequance to the main
+	sorted.vector.insert(sorted.vector.begin(), sorted_sub.vector.front());
+	sorted.index.insert(sorted.index.begin(), sorted_sub.index.front());
+	for (int i = 1; std::pow(2, i) - 1 < sorted_sub.vector.size(); ++i)
 	{
-		if (i == 0)
-		{
-			sorted.vector.insert(sorted.vector.begin(), sorted_sub.vector.front());
-			sorted.index.insert(sorted.index.begin(), sorted_sub.index.front());
-			continue;
-		}
 		last_k = jacobsthal_modified(i - 1); // 0
 		k = jacobsthal_modified(i);          // 2
-		while (k > last_k)
+		while (k > last_k )
 		{
 			if ((size + 1) / 2 > k)
 			{
- 				iterator insert_pos = binary_search(sorted.vector.begin(), sorted.vector.begin() + k + 1 + last_k, *(sorted_sub.vector.begin() + k), compar_num);
+ 				iterator insert_pos = binary_search(sorted.vector.begin(), sorted.vector.begin() + add_end_of_search(i, sorted.vector.size()), *(sorted_sub.vector.begin() + k), compar_num);
 				int pos = 0;
 				iterator pos_it = sorted.vector.begin();
 				while (insert_pos != pos_it)
@@ -207,6 +219,15 @@ t_index PmergeMe::ford_johnson_algorithm(t_index to_sort, int &compar_num)
 	}
 	return (sorted);
 }
+
+// 3 3 7 7 15 15 15 15 15 15
+int PmergeMe::add_end_of_search(int i, int size)
+{
+	int pos = std::pow(2, i + 1) - 1;
+	return (pos > size ? size : pos);
+}
+
+
 //     2 4 10 20 42
 //0 1 1 3 5 11 21 43 85 171 341 683 1365 2731 5461 10923 21845 43691
 /////////////////////////////////////////////////////1               end        2
@@ -301,13 +322,13 @@ int PmergeMe::merge_insertion_worst_case_bound(int array_size)
 
 
 
-/* int main(int ac, char **av)
+int main(int ac, char **av)
 {
 	std::vector<int> vec;
 
-	int N = 10;
+	int N = 22;
 	for (int i = 0; i < N; ++i)
-		vec.push_back(N - i);
+		vec.push_back(i);
 	std::cout << "Before:  ";
 	for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it)
 		std::cout << *it << ((it + 1 != vec.end()) ? " " : "\n");
@@ -325,7 +346,7 @@ int PmergeMe::merge_insertion_worst_case_bound(int array_size)
 
 	}
 	return (0);
-} */
+}
 
 
 
@@ -340,7 +361,7 @@ int PmergeMe::merge_insertion_worst_case_bound(int array_size)
 
 
 
-int main(int ac, char **av)
+/* int main(int ac, char **av)
 {
 	if (ac == 1)
 		return (std::cerr << "Error: No arguments provided. Example:\n./PmergeMe `shuf -i 1-100000 -n 3000 | tr \"\\n\" \" \"`\n./PmergeMe `shuf -i 1-200000 -n 140000 | tr \"\\n\" \" \"`\n", 1);
@@ -387,7 +408,7 @@ int main(int ac, char **av)
 		return (std::cerr << e.what() << std::endl, 1);
 	}
 	return (0);
-}
+} */
 
 
 
