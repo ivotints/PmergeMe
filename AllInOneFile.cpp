@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+//valgrind ./PmergeMe `shuf -i 1-100000 -n 3000 | tr "\n" " "` | ./checker_2.0
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -194,11 +196,11 @@ t_index PmergeMe::ford_johnson_algorithm(t_index to_sort, int &compar_num)
 	// insert from sub_sequance to the main
 	sorted.vector.insert(sorted.vector.begin(), sorted_sub.vector.front());
 	sorted.index.insert(sorted.index.begin(), sorted_sub.index.front());
-	for (int i = 1; std::pow(2, i) - 1 < sorted_sub.vector.size(); ++i)
+	for (int i = 1; std::pow(2, i) - 1 < size; ++i) // size inseead of .size() ????
 	{
 		last_k = jacobsthal_modified(i - 1); // 0
 		k = jacobsthal_modified(i);          // 2
-		while (k > last_k )
+		while (k > last_k)
 		{
 			if ((size + 1) / 2 > k)
 			{
@@ -322,7 +324,7 @@ int PmergeMe::merge_insertion_worst_case_bound(int array_size)
 
 
 
-int main(int ac, char **av)
+/* int main(int ac, char **av)
 {
 	std::vector<int> vec;
 
@@ -346,7 +348,7 @@ int main(int ac, char **av)
 
 	}
 	return (0);
-}
+} */
 
 
 
@@ -361,7 +363,7 @@ int main(int ac, char **av)
 
 
 
-/* int main(int ac, char **av)
+int main(int ac, char **av)
 {
 	if (ac == 1)
 		return (std::cerr << "Error: No arguments provided. Example:\n./PmergeMe `shuf -i 1-100000 -n 3000 | tr \"\\n\" \" \"`\n./PmergeMe `shuf -i 1-200000 -n 140000 | tr \"\\n\" \" \"`\n", 1);
@@ -408,7 +410,7 @@ int main(int ac, char **av)
 		return (std::cerr << e.what() << std::endl, 1);
 	}
 	return (0);
-} */
+}
 
 
 
