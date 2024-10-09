@@ -13,6 +13,14 @@
 #include <cmath>
 #include <unistd.h>
 
+
+/*
+	It will take first 2 lines from standart input:
+	Before:  5 9 10 6 2 8 3 1 7 4
+	After:   1 2 3 4 5 6 7 8 9 10
+
+	, sort first line and compare to second. Prints Yes in case of success.
+ */
 int main()
 {
 	std::vector<std::string> tokens_not_sorted;
@@ -45,10 +53,10 @@ int main()
 	std::vector<int> not_sorted;
 	std::vector<int> sorted;
 
-	for (int i = 0; i < tokens_not_sorted.size(); ++i)
+	for (unsigned int i = 0; i < tokens_not_sorted.size(); ++i)
 		not_sorted.push_back(std::atoi(tokens_not_sorted[i].c_str()));
 
-	for (int i = 0; i < tokens_sorted.size(); ++i)
+	for (unsigned int i = 0; i < tokens_sorted.size(); ++i)
 		sorted.push_back(std::atoi(tokens_sorted[i].c_str()));
 
 	for (std::size_t i = 0; i < not_sorted.size(); ++i)
